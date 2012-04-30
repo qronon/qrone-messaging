@@ -7,6 +7,7 @@ import java.util.LinkedList;
 import java.util.Map;
 import java.util.Set;
 
+import org.qrone.util.Token;
 import org.qrone.xmlsocket.XMLSocket;
 import org.qrone.xmlsocket.XMLSocketServer;
 import org.qrone.xmlsocket.event.XMLSocketListener;
@@ -18,7 +19,10 @@ public class QrONEMessagingServer implements XMLSocketServerListener{
 	public static final int SERVER_PORT = 9645;
 	
 	private XMLSocketServer socketServer;
-	private Map<String, Set<QrONEMessagingClientConn>> map = new HashMap<String, Set<QrONEMessagingClientConn>>();
+	private Map<String, Token> signmap
+		= new HashMap<String, Token>();
+	private Map<String, Set<QrONEMessagingClientConn>> map
+		= new HashMap<String, Set<QrONEMessagingClientConn>>();
 	
 	public QrONEMessagingServer(){
 		

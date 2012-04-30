@@ -13,6 +13,12 @@
     
     <dependency>
    	  <groupId>qrone</groupId>
+ 	  <artifactId>qrone-util</artifactId>
+ 	  <version>0.1</version>
+    </dependency>
+    
+    <dependency>
+   	  <groupId>qrone</groupId>
  	  <artifactId>qrone-xmlsocket-nio</artifactId>
  	  <version>1.0</version>
     </dependency>

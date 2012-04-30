@@ -48,11 +48,14 @@ public class QrONEMessagingClientConn implements XMLSocketListener{
 		try {
 			JSONObject obj = new JSONObject(data);
 			
-			String target = obj.getString("target");
+			String join = obj.getString("join");
+			String ticket = obj.getString("ticket");
 			
-			Set<QrONEMessagingClientConn> set = server.getTargets(target);
-			for (Iterator<QrONEMessagingClientConn> iter = set.iterator(); iter.hasNext();) {
-				iter.next().xmlsocket.send(data);
+			Set<QrONEMessagingClientConn> set = server.getTargets(join);
+			if(set != null){
+				for (Iterator<QrONEMessagingClientConn> iter = set.iterator(); iter.hasNext();) {
+					iter.next().xmlsocket.send(data);
+				}
 			}
 			
 		} catch (JSONException e) {
