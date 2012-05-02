@@ -3,20 +3,24 @@ package org.qrone.messaging;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Map;
 import java.util.Set;
 
+import org.json.JSONObject;
 import org.qrone.util.Token;
 import org.qrone.xmlsocket.XMLSocket;
 import org.qrone.xmlsocket.XMLSocketServer;
 import org.qrone.xmlsocket.event.XMLSocketListener;
 import org.qrone.xmlsocket.event.XMLSocketServerListener;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 
 public class QrONEMessagingServer implements XMLSocketServerListener{
-
-	public static final int SERVER_PORT = 9645;
+	private static final Logger logger = LoggerFactory.getLogger(QrONEMessagingServer.class);
+	public static final int SERVER_PORT = 9699;
 	
 	private XMLSocketServer socketServer;
 	private Map<String, Token> signmap
@@ -33,7 +37,6 @@ public class QrONEMessagingServer implements XMLSocketServerListener{
 		}
 		socketServer.setEncoding("UTF-8");
 		socketServer.addXMLSocketServerListener(this);
-		socketServer.open(SERVER_PORT);
 	}
 	
 	public void listen(int port){
@@ -42,39 +45,75 @@ public class QrONEMessagingServer implements XMLSocketServerListener{
 
 	@Override
 	public void onOpen(boolean success) {
-		// TODO Auto-generated method stub
+		logger.info("onOpen:" + success);
 	}
 
 	@Override
 	public void onClose() {
-		// TODO Auto-generated method stub
+		logger.info("onClose");
 	}
 
 	@Override
 	public void onError(Exception e) {
-		// TODO Auto-generated method stub
+		logger.info("onError:" + e);
+		e.printStackTrace();
 	}
 	
-	public Set<QrONEMessagingClientConn> getTargets(String groupId){
-		return map.get(groupId);
+	public void to(QrONEMessagingClientConn conn, String target, JSONObject obj){
+		logger.info("to:" + target + ":" + obj);
+		Set<QrONEMessagingClientConn> set = map.get(target);
+		if(set != null){
+			for (Iterator<QrONEMessagingClientConn> iter = set.iterator(); iter.hasNext();) {
+				iter.next().getSocket().send(obj.toString());
+			}
+		}
 	}
-	
-	public void setTarget(String groupId, QrONEMessagingClientConn conn){
-		Set<QrONEMessagingClientConn> set = map.get(groupId);
+
+	public boolean join(QrONEMessagingClientConn conn, String target){
+		logger.info("join:" + target);
+		Set<QrONEMessagingClientConn> set = map.get(target);
 		if(set == null){
 			set = new HashSet<QrONEMessagingClientConn>();
-			map.put(groupId, set);
+			map.put(target, set);
 		}
 		
 		set.add(conn);
+		return true;
+	}
+	
+	public boolean left(QrONEMessagingClientConn conn, String target){
+		logger.info("join:" + target);
+		Set<QrONEMessagingClientConn> set = map.get(target);
+		if(set != null){
+			if(set.size() <= 1){
+				if(map.containsKey(target)){					
+					map.remove(target);
+					return true;
+				}
+			}else{
+				return set.remove(conn);
+			}
+		}
+		return false;
+		
+	}
+
+	public boolean canReceive(String target, Token ticket){
+		return true;
+	}
+	
+	public boolean canSend(String target, Token ticket){
+		return true;
 	}
 
 	@Override
 	public void onNewClient(XMLSocket xmlsocket) {
+		logger.info("onNewClient:" + xmlsocket.toString());
 		QrONEMessagingClientConn conn = new QrONEMessagingClientConn(this, xmlsocket);
 	}
 		
 	public static void main(String[] args){
+		logger.info("main:");
 		QrONEMessagingServer server = new QrONEMessagingServer();
 		server.listen(SERVER_PORT);
 	}

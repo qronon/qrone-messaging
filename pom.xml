@@ -22,7 +22,19 @@
  	  <artifactId>qrone-xmlsocket-nio</artifactId>
  	  <version>1.0</version>
     </dependency>
+  <dependency>
+  	<groupId>org.slf4j</groupId>
+  	<artifactId>slf4j-simple</artifactId>
+  	<version>1.6.4</version>
+  </dependency>
   </dependencies>
+  
+  <repositories>
+     <repository>
+        <id>qrone</id>
+        <url>http://mvn.qrone.org/</url>
+    </repository>
+  </repositories>
   
   <distributionManagement>
     <repository>
@@ -45,6 +57,30 @@
             <source>1.6</source>
             <target>1.6</target>
         </configuration>
+      </plugin>
+      <plugin>
+        <artifactId>maven-assembly-plugin</artifactId>
+        <version>2.3</version>
+        <configuration>
+          <descriptorRefs>
+            <descriptorRef>jar-with-dependencies</descriptorRef>
+          </descriptorRefs>
+          <archive>
+            <manifest>
+              <mainClass>org.qrone.r7.app.QrONEApp</mainClass>
+            </manifest>
+          </archive>
+ 
+        </configuration>
+        <executions>
+          <execution>
+            <id>make-assembly</id> 
+            <phase>package</phase>
+            <goals>
+              <goal>single</goal>
+            </goals>
+          </execution>
+        </executions>
       </plugin>
     </plugins>
   </build>
